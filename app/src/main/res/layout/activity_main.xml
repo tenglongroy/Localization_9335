@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/text1"
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="30dp"
+            android:text="Press button to locate" />
+        <com.dd.ShadowLayout
+            android:layout_marginTop="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:sl_shadowRadius="10dp"
+            app:sl_shadowColor="#de646464"
+            app:sl_dx="0dp"
+            app:sl_dy="0dp"
+            app:sl_cornerRadius="18dp">
+            <!--http://stackoverflow.com/questions/15333529/how-to-provide-shadow-to-button-->
+
+            <Button
+                android:id="@+id/buttonlocate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_green"
+                android:text="Locate" />
+        </com.dd.ShadowLayout>
+    </LinearLayout>
+    <ImageView
+        android:id="@+id/iv_canvas"
+        android:layout_width="360dp"
+        android:layout_height="188dp"
+        android:layout_marginTop="200dp"/>
+</RelativeLayout>
