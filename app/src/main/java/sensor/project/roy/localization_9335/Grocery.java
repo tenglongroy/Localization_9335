@@ -1,7 +1,12 @@
 package sensor.project.roy.localization_9335;
 
 import android.net.wifi.ScanResult;
+import android.os.Environment;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 class Grocery{
@@ -67,6 +72,14 @@ class Grocery{
         ArrayList<Float> rssiList = getRealTimeList(mediaList);
         if(rssiList == null)    //not enough AP scanned
             return null;
+        /*File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/9335");
+        File[] fileArray = dir.listFiles();
+        System.out.println(fileArray.toString());
+        if(fileArray != null){
+            for(int iii = 0;iii<fileArray.length;iii++){
+                adsf = readNewFile(fileArray[iii]);
+            }
+        }*/
         ArrayList<String> rankedCoor = euclidean(rssiList, level3RSSI);
         /*
         Deal with "rankedCoor", get topk coordinates as you wish
@@ -124,6 +137,30 @@ class Grocery{
                 break;
         }
         return ahead - index;
+    }
+    //method not finished
+    public static void makeDB(String fileName){
+        ArrayList<String> totalLine = new ArrayList<>();
+        File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/9335");
+        dir.mkdir();
+        File file = new File(dir, fileName);
+        try{
+            FileInputStream fis = new FileInputStream(file);
+            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                totalLine.add(line);
+            }
+            br.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        for(int i =0; i<totalLine.size();i++){
+            String[] timeline = totalLine.get(i).split(" ");
+            String coorX = timeline[0];
+            String coorY = timeline[1];
+        }
     }
     public static int checkFloor(String mac){       //return which floor this MAC belongs
         /*for(int i = 0;i<level3BaseMac.length;i++)
