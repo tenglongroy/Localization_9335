@@ -93,9 +93,10 @@ public class MainActivity extends AppCompatActivity {
             }
             else {
                 tryTimes = 1;
-                float[] receivedLocation = msg.getData().getFloatArray("location");
+                String[] receivedLocation = msg.getData().getStringArray("location");
                 text1.setText("Location\nX: "+receivedLocation[0]+" Y: "+receivedLocation[1]+" floor: "+receivedLocation[2]);
-                mcanvasLocation.drawLocation(receivedLocation[0],receivedLocation[1]);
+                mcanvasLocation.drawLocation(Float.parseFloat(receivedLocation[0].charAt(0) + ""),
+                        Float.parseFloat(receivedLocation[0].charAt(1)+""));
                 //buttonlocate.setVisibility(View.VISIBLE);
                 buttonlocate.setBackgroundResource(R.drawable.shape_green);
                 buttonlocate.setClickable(true);
@@ -112,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         appScan = false;
                         ArrayList<ScanResult> result = (ArrayList<ScanResult>)mWifiManager.getScanResults();
-                        float[] location = Grocery.computeLocation(result);
+                        String[] location = Grocery.computeLocation(result);
                         if(location == null){   //not enough AP to localize
                             Message msg = new Message();
                             msg.what = 0;
@@ -122,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                             Message msg = new Message();
                             msg.what = 1;
                             Bundle bd = new Bundle();
-                            bd.putFloatArray("location", location);
+                            bd.putStringArray("location", location);
                             msg.setData(bd);
                             myTextViewHandler.sendMessage(msg);
                         }
