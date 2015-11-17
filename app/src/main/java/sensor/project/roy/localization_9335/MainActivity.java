@@ -77,7 +77,8 @@ public class MainActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             if(msg.what == 0){      //not enough AP to localize
                 if(tryTimes > 10) {
-                    text1.setText("Retried 10 times and failed, stop");
+                    tryTimes = 1;
+                    text1.setText("Failed 10 times, stop");
                     buttonlocate.setBackgroundResource(R.drawable.shape_green);
                     buttonlocate.setClickable(true);
                     return;
@@ -94,7 +95,8 @@ public class MainActivity extends AppCompatActivity {
             else {
                 tryTimes = 1;
                 String[] receivedLocation = msg.getData().getStringArray("location");
-                text1.setText("Location\nX: "+receivedLocation[0]+" Y: "+receivedLocation[1]+" floor: "+receivedLocation[2]);
+                text1.setText("Location\nX: "+receivedLocation[0]+" Y: "+receivedLocation[1]+
+                        " floor: "+receivedLocation[2]+" #AP:"+receivedLocation[4]);
                 mcanvasLocation.drawLocation(Float.parseFloat(receivedLocation[0].charAt(0) + ""),
                         Float.parseFloat(receivedLocation[0].charAt(1)+""));
                 //buttonlocate.setVisibility(View.VISIBLE);

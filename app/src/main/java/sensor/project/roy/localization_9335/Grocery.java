@@ -126,6 +126,12 @@ class Grocery{
             }
         }
         ArrayList<Float> rssiList = getRealTimeList(mediaList);
+        int count = 0;
+        for(int i = 0;i<rssiList.size();i++){
+            if(rssiList.get(i) == (float)1 ) {    //not enough AP scanned
+                count ++;
+            }
+        }
         if(rssiList == null)    //not enough AP scanned
             return null;
         /*
@@ -137,7 +143,8 @@ class Grocery{
         Deal with "rankedCoor", get topk coordinates as you wish
          */
         System.out.println(rankedCoor.toString());
-        String[] result = {rankedCoor.get(0), rankedCoor.get(1), rankedCoor.get(2), String.valueOf(floor)};
+        String[] result = {rankedCoor.get(0), rankedCoor.get(1), rankedCoor.get(2),
+                String.valueOf(floor), String.valueOf(6-count)};
         System.out.println("rankedCoor --> "+result.toString());
         return result;
     }
@@ -175,7 +182,8 @@ class Grocery{
         for(int i = 0;i<rssiList.size();i++){
             if(rssiList.get(i) == (float)1 ) {    //not enough AP scanned
                 System.out.println("not enough AP "+rssiList.toString());
-                return null;
+                return rssiList;
+                //return null;
             }
         }
         return rssiList;
@@ -266,7 +274,9 @@ class Grocery{
                     return i;
         return -1;
     }
-    //get ranked coordinates here
+    /**
+    get ranked coordinates here, with 1 RSSIdataSet
+     */
     public static ArrayList<String> euclidean(ArrayList<Float> realtimeList, Object[][] databaseList){
         double total=0;
         ArrayList<Object[]> mixedRankList = new ArrayList<>();
@@ -284,14 +294,20 @@ class Grocery{
             rankedCoordinate.add((String)mixedRankList.get(i)[0]);
         return rankedCoordinate;
     }
+    /**
+    parameters are 3 RSSIdataSets
+     */
     public static ArrayList<String> euclidean(ArrayList<Float> realtimeList, Object[][] dataAList,
                                               Object[][] dataBList, Object[][] dataCList){
         double total=0;
+        double mean;
         ArrayList<Object[]> mixedRankList = new ArrayList<>();
         for(int row = 0;row<dataAList.length;row++) {    //build array of {{'63',-78},...{'62',-89}}
             total = 0;
             for (int j = 0; j < realtimeList.size(); j++) {
-                double mean = ((double)dataAList[row][j+1]+(double)dataBList[row][j+1]+(double)dataCList[row][j+1])/3;
+                if(realtimeList.get(j) == (float)1)
+                    continue;
+                mean = ((double)dataAList[row][j+1]+(double)dataBList[row][j+1]+(double)dataCList[row][j+1])/3;
                 total += Math.pow(((double)realtimeList.get(j) - mean), 2);
             }
             mixedRankList.add(new Object[]{dataAList[row][0], Math.sqrt(total)});
