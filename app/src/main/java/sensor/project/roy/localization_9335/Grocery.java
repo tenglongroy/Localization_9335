@@ -112,7 +112,7 @@ class Grocery{
                 counter[floor-1] += 1;
             }
         }
-        System.out.println(counter[0]+" "+ counter[1]+" "+ counter[2]);
+        //System.out.println(counter[0]+" "+ counter[1]+" "+ counter[2]);   //number of APs in corresponding floor
         floor = counter[2] > counter[1]? 3:2;       //determine which floor has more MAC
         floor = counter[floor-1] > counter[0]? floor:1;
         ScanResult temp;
@@ -132,20 +132,25 @@ class Grocery{
                 count ++;
             }
         }
-        if(rssiList == null)    //not enough AP scanned
+        /*if(rssiList == null)    //not enough AP scanned
+            return null;*/
+        System.out.println(count);
+        if(count>2)
             return null;
         /*
-        Might read data from file to replace the written data
+        Might read data from file to replace the pre-written data
          */
         //ArrayList<String> rankedCoor = euclidean(rssiList, level3RSSI);
+        System.out.println(rssiList);
         ArrayList<String> rankedCoor = euclidean(rssiList, level3SetA, level3SetB, level3SetC);
         /*
-        Deal with "rankedCoor", get topk coordinates as you wish
+        Deal with "rankedCoor", get top-k coordinates as you wish
          */
         System.out.println(rankedCoor.toString());
-        String[] result = {rankedCoor.get(0), rankedCoor.get(1), rankedCoor.get(2),
-                String.valueOf(floor), String.valueOf(6-count)};
-        System.out.println("rankedCoor --> "+result.toString());
+        /*String[] result = {rankedCoor.get(0), rankedCoor.get(1), rankedCoor.get(2),
+                String.valueOf(floor), String.valueOf(6-count)};*/
+        String[] result = {rankedCoor.get(0).substring(0,1),rankedCoor.get(0).substring(1,2),String.valueOf(floor)};
+        //System.out.println("rankedCoor --> "+result);
         return result;
     }
     public static ArrayList getRealTimeList(ArrayList<ScanResult> mediaList){   //return a list like [-67,-79.....]
@@ -179,13 +184,13 @@ class Grocery{
                 i++;
             }
         }
-        for(int i = 0;i<rssiList.size();i++){
+        /*for(int i = 0;i<rssiList.size();i++){
             if(rssiList.get(i) == (float)1 ) {    //not enough AP scanned
                 System.out.println("not enough AP "+rssiList.toString());
                 return rssiList;
                 //return null;
             }
-        }
+        }*/
         return rssiList;
     }
     public static int getSameAPinListLocation(ArrayList<ScanResult> originList, int index){
@@ -288,7 +293,7 @@ class Grocery{
             mixedRankList.add(new Object[]{databaseList[row][0], Math.sqrt(total)});
         }
         sortArray(mixedRankList);
-        System.out.println("mixList -- " + mixedRankList.toString());
+        //System.out.println("mixList -- " + mixedRankList.toString());
         ArrayList<String> rankedCoordinate = new ArrayList<>();
         for(int i = 0;i<mixedRankList.size();i++)       //append sorted coordinate
             rankedCoordinate.add((String)mixedRankList.get(i)[0]);
@@ -313,10 +318,10 @@ class Grocery{
             mixedRankList.add(new Object[]{dataAList[row][0], Math.sqrt(total)});
         }
         sortArray(mixedRankList);
-        System.out.println("mixList -- ");
+        /*System.out.println("mixList -- ");
         for(int index = 0; index<mixedRankList.size();index++)
             System.out.print(mixedRankList.get(index)[0]+"..."+mixedRankList.get(index)[1]+" ");
-        System.out.println();
+        System.out.println();*/
         ArrayList<String> rankedCoordinate = new ArrayList<>();
         for(int i = 0;i<mixedRankList.size();i++)       //append sorted coordinate
             rankedCoordinate.add((String)mixedRankList.get(i)[0]);

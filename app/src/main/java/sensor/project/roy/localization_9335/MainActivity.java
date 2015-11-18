@@ -55,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
         buttonlocate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mWifiManager.startScan();
                 appScan = true;     //prevent non-stop System-auto scan
+                mWifiManager.startScan();
                 //buttonlocate.setVisibility(View.INVISIBLE);
                 buttonlocate.setBackgroundResource(R.drawable.shape_gray);
                 buttonlocate.setClickable(false);
@@ -83,22 +83,22 @@ public class MainActivity extends AppCompatActivity {
                     buttonlocate.setClickable(true);
                     return;
                 }
-                text1.setText("Not enough AP, retry "+tryTimes+" times");
+                text1.setText("Not enough AP, retry " + tryTimes + " times");
                 if(tryTimes == 1){
                     mcanvasLocation.resumeCanvas();
                     mcanvasLocation.clearSCR();
                 }
+                appScan = true;     //allow scanResult accept
                 mWifiManager.startScan();
                 tryTimes++;
-                appScan = true;     //allow scanResult accept
             }
             else {
                 tryTimes = 1;
                 String[] receivedLocation = msg.getData().getStringArray("location");
-                text1.setText("Location\nX: "+receivedLocation[0]+" Y: "+receivedLocation[1]+
-                        " floor: "+receivedLocation[2]+" #AP:"+receivedLocation[4]);
-                mcanvasLocation.drawLocation(Float.parseFloat(receivedLocation[0].charAt(0) + ""),
-                        Float.parseFloat(receivedLocation[0].charAt(1)+""));
+                text1.setText("X: " + receivedLocation[0] + " Y: " + receivedLocation[1] +
+                        " floor: " + receivedLocation[2]);
+                mcanvasLocation.drawLocation(Float.parseFloat(receivedLocation[0]),
+                        Float.parseFloat(receivedLocation[1]));
                 //buttonlocate.setVisibility(View.VISIBLE);
                 buttonlocate.setBackgroundResource(R.drawable.shape_green);
                 buttonlocate.setClickable(true);
