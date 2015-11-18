@@ -134,7 +134,7 @@ class Grocery{
         }
         /*if(rssiList == null)    //not enough AP scanned
             return null;*/
-        System.out.println(count);
+        System.out.println("count "+count);
         if(count>2)
             return null;
         /*
@@ -155,7 +155,7 @@ class Grocery{
     }
     public static ArrayList getRealTimeList(ArrayList<ScanResult> mediaList){   //return a list like [-67,-79.....]
         ArrayList<Float> rssiList = new ArrayList<>(6);
-        rssiList.add((float) 1.0);      //noob way
+        rssiList.add((float) 1.0);      //noob way of initialize a 6-length list
         rssiList.add((float)1.0);
         rssiList.add((float)1.0);
         rssiList.add((float)1.0);
@@ -204,7 +204,9 @@ class Grocery{
         }
         return ahead - index;
     }
-    //method not finished
+    /*
+    method not finished
+    */
     public static void makeDB(String fileName){
         ArrayList<String> totalLine = new ArrayList<>();
         File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/9335");

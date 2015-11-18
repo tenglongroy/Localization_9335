@@ -51,15 +51,14 @@ public class MainActivity extends AppCompatActivity {
         iv_canvas.setBackgroundResource(R.drawable.ainsworthandroid);
         mcanvasLocation = new CanvasLocation(this, iv_canvas);
         buttonlocate = (Button) findViewById(R.id.buttonlocate);
-        //buttonlocate.setBackgroundResource(R.drawable.button_green);
         buttonlocate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 appScan = true;     //prevent non-stop System-auto scan
                 mWifiManager.startScan();
-                //buttonlocate.setVisibility(View.INVISIBLE);
                 buttonlocate.setBackgroundResource(R.drawable.shape_gray);
                 buttonlocate.setClickable(false);
+                text1.setText("Scanning for Location");
             }
         });
         mWifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
@@ -78,16 +77,17 @@ public class MainActivity extends AppCompatActivity {
             if(msg.what == 0){      //not enough AP to localize
                 if(tryTimes > 10) {
                     tryTimes = 1;
-                    text1.setText("Failed 10 times, stop");
+                    text1.setText("Failed 10 times\nStop");
                     buttonlocate.setBackgroundResource(R.drawable.shape_green);
                     buttonlocate.setClickable(true);
                     return;
                 }
-                text1.setText("Not enough AP, retry " + tryTimes + " times");
+                text1.setText("Failed\nRetry " + tryTimes + " times");
                 if(tryTimes == 1){
                     mcanvasLocation.resumeCanvas();
                     mcanvasLocation.clearSCR();
                 }
+                System.out.println(tryTimes);
                 appScan = true;     //allow scanResult accept
                 mWifiManager.startScan();
                 tryTimes++;
@@ -136,7 +136,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-
 
 }
