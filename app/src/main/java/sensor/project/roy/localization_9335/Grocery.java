@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 class Grocery{
     Grocery()
@@ -107,12 +108,11 @@ class Grocery{
         int floor;
         int[] counter = {0,0,0};
         for(int i = 0;i<outerList.size();i++){
-            if((floor=Grocery.checkFloor(outerList.get(i).BSSID)) > 0){
+            if((floor=Grocery.checkFloor(outerList.get(i).BSSID)) > 0){ //limit macAddress in baseMacSet
                 mediaList.add(outerList.get(i));
                 counter[floor-1] += 1;
             }
         }
-        //System.out.println(counter[0]+" "+ counter[1]+" "+ counter[2]);   //number of APs in corresponding floor
         floor = counter[2] > counter[1]? 3:2;       //determine which floor has more MAC
         floor = counter[floor-1] > counter[0]? floor:1;
         ScanResult temp;
@@ -125,10 +125,11 @@ class Grocery{
                 }
             }
         }
-        ArrayList<Float> rssiList = getRealTimeList(mediaList);
+        //ArrayList<Float> rssiList = getRealTimeList(mediaList);
+        ArrayList<Float> rssiList = getRealTimeList1(mediaList);
         int count = 0;
         for(int i = 0;i<rssiList.size();i++){
-            if(rssiList.get(i) == (float)1 ) {    //not enough AP scanned
+            if(rssiList.get(i) == (float)0 ) {    //not enough AP scanned
                 count ++;
             }
         }
@@ -153,17 +154,23 @@ class Grocery{
         //System.out.println("rankedCoor --> "+result);
         return result;
     }
+
+    /**
+     * given “mediaList” containing sorted and processed ScanResults, this method calculates
+     * the average RSSI for every selected AP (3 mac addresses).
+     * @param mediaList
+     * @return
+     */
     public static ArrayList getRealTimeList(ArrayList<ScanResult> mediaList){   //return a list like [-67,-79.....]
         ArrayList<Float> rssiList = new ArrayList<>(6);
-        rssiList.add((float) 1.0);      //noob way of initialize a 6-length list
-        rssiList.add((float)1.0);
-        rssiList.add((float)1.0);
-        rssiList.add((float)1.0);
-        rssiList.add((float)1.0);
-        rssiList.add((float)1.0);
-        /*for(int i = 0;i<rssiList.size();i++)    //initialize "rssiList" with (float)1
-            rssiList.set(i, (float)1);*/
-        //System.out.println(mediaList.toString());
+        rssiList.add((float) 0.0);      //noob way of initialize a 6-length list
+        rssiList.add((float)0.0);
+        rssiList.add((float)0.0);
+        rssiList.add((float)0.0);
+        rssiList.add((float)0.0);
+        rssiList.add((float) 0.0);
+        for(int a = 0; a<mediaList.size(); a++)
+            System.out.println(mediaList.get(a).BSSID+"\t"+mediaList.get(a).level);
         for(int i = 0;i<mediaList.size();  ){   //fill "rssiList" with average rssi
             int loc = getSameAPinListLocation(mediaList, i);
             int count=0;
@@ -184,15 +191,44 @@ class Grocery{
                 i++;
             }
         }
-        /*for(int i = 0;i<rssiList.size();i++){
-            if(rssiList.get(i) == (float)1 ) {    //not enough AP scanned
-                System.out.println("not enough AP "+rssiList.toString());
-                return rssiList;
-                //return null;
-            }
-        }*/
+        System.out.println("old realTimeList --> " + rssiList.toString());
         return rssiList;
     }
+
+    /**
+     * given “mediaList” containing sorted and processed ScanResults, this method calculates
+     * the average RSSI for every selected AP (3 mac addresses).
+     * @param mediaList
+     * @return
+     */
+    private static ArrayList getRealTimeList1(ArrayList<ScanResult> mediaList){
+        ArrayList<Float> rssiList = new ArrayList<Float>(Arrays.asList((float)0.0, (float)0.0, (float)0.0,
+                (float)0.0, (float)0.0, (float)0.0));
+        ArrayList<Integer> countList = new ArrayList<Integer>(Arrays.asList(0, 0, 0, 0, 0, 0));
+
+        int APIndex, tempCount;
+        float tempRSSI;
+        for(int i = 0;i<mediaList.size(); i++) {   //fill "rssiList" with average rssi
+            APIndex = checkAP(mediaList.get(i).BSSID, level3BaseMac);
+            tempRSSI = rssiList.get(APIndex);
+            tempRSSI += mediaList.get(i).level;
+            rssiList.set(APIndex, tempRSSI);
+            tempCount = countList.get(APIndex);
+            tempCount += 1;
+            countList.set(APIndex, tempCount);
+        }
+        for(int j = 0; j<rssiList.size(); j++){
+            tempRSSI = rssiList.get(j);
+            tempCount = countList.get(j);
+            if(tempCount == 0)
+                continue;
+            rssiList.set(j, tempRSSI / (float) tempCount);
+        }
+        System.out.println("new realTimeList --> " + rssiList.toString());
+
+        return rssiList;
+    }
+
     public static int getSameAPinListLocation(ArrayList<ScanResult> originList, int index){
         /*if(index == originList.size()-1)    //index is the last
             return -1;*/
@@ -230,22 +266,14 @@ class Grocery{
             String coorY = timeline[1];
         }
     }
+
+    /**
+     * check which mac address sets this given “mac” is in, return 1 or 2 or 3
+     * corresponding to the floors if exists, or -1 if not.
+     * @param mac
+     * @return
+     */
     public static int checkFloor(String mac){       //return which floor this MAC belongs
-        /*for(int i = 0;i<level3BaseMac.length;i++)
-            for(int j = 0;j<level3BaseMac[i].length;j++){
-                if(mac.equals(level3BaseMac[i][j]))
-                    return 3;
-            }
-        for(int i = 0;i<level2BaseMac.length;i++)
-            for(int j = 0;j<level2BaseMac[i].length;j++){
-                if(mac.equals(level2BaseMac[i][j]))
-                    return 2;
-            }
-        for(int i = 0;i<level1BaseMac.length;i++)
-            for(int j = 0;j<level1BaseMac[i].length;j++){
-                if(mac.equals(level1BaseMac[i][j]))
-                    return 1;
-            }*/
         if(checkAP(mac, level3BaseMac)>-1)
             return 3;
         if(checkAP(mac, level2BaseMac)>-1)
@@ -254,6 +282,14 @@ class Grocery{
             return 1;
         return -1;
     }
+
+    /**
+     * check if the given “mac” exists in this “basemac” set or not,
+     * return the index in the set if exists, or -1 if not.
+     * @param mac
+     * @param basemac
+     * @return
+     */
     public static int checkAP(String mac, String[][] basemac){
         if(basemac == null)
             return -1;
@@ -301,8 +337,14 @@ class Grocery{
             rankedCoordinate.add((String)mixedRankList.get(i)[0]);
         return rankedCoordinate;
     }
+
     /**
-    parameters are 3 RSSIdataSets
+     * get ranked coordinates here, with parameters of 3 RSSIdataSets
+     * @param realtimeList
+     * @param dataAList
+     * @param dataBList
+     * @param dataCList
+     * @return
      */
     public static ArrayList<String> euclidean(ArrayList<Float> realtimeList, Object[][] dataAList,
                                               Object[][] dataBList, Object[][] dataCList){
@@ -312,7 +354,7 @@ class Grocery{
         for(int row = 0;row<dataAList.length;row++) {    //build array of {{'63',-78},...{'62',-89}}
             total = 0;
             for (int j = 0; j < realtimeList.size(); j++) {
-                if(realtimeList.get(j) == (float)1)
+                if(realtimeList.get(j) == (float)0)     //AP not present
                     continue;
                 mean = ((double)dataAList[row][j+1]+(double)dataBList[row][j+1]+(double)dataCList[row][j+1])/3;
                 total += Math.pow(((double)realtimeList.get(j) - mean), 2);
@@ -329,6 +371,7 @@ class Grocery{
             rankedCoordinate.add((String)mixedRankList.get(i)[0]);
         return rankedCoordinate;
     }
+
     //get ranked coordinates here
     public static ArrayList<String> cosine(ArrayList<Float> realtimeList, Object[][] databaseList){
         float fenzi = 0;
@@ -352,6 +395,7 @@ class Grocery{
             rankedCoordinate.add((String)mixedRankList.get(i)[0]);
         return rankedCoordinate;
     }
+
     public static void sortArray(ArrayList<Object[]> needSort){
         for(int i = 0;i<needSort.size()-1;i++)     //sort array
             for(int j = i+1;j<needSort.size();j++){
