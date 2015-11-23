@@ -62,7 +62,7 @@ class CanvasLocation{
     }
     private float[] calCoor(float x, float y){
         float width = mImageView.getWidth();
-        float height = mImageView.getHeight();
+        float height = mImageView.getHeight() *0.9f;
         float wid_block = width/12;
         float hei_block = height/6;
         float[] result = new float[2];

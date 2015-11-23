@@ -12,6 +12,7 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView text1;
     private ImageView iv_canvas;
     private CanvasLocation mcanvasLocation;
+    private CheckBox checkBox;
     WifiManager mWifiManager;
     wifiScanReceiver mReceiver;
     int tryTimes = 1;
@@ -61,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
                 text1.setText("Scanning for Location");
             }
         });
+        checkBox = (CheckBox) findViewById(R.id.chechBox);
         mWifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
         mWifiManager.setWifiEnabled(true);
     }
@@ -115,7 +118,13 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         appScan = false;
                         ArrayList<ScanResult> result = (ArrayList<ScanResult>)mWifiManager.getScanResults();
-                        String[] location = Grocery.computeLocation(result);
+                        String[] location;
+                        if(checkBox.isChecked()){
+                            location = Grocery.computeLocation(result, 1);
+                        }
+                        else {
+                            location = Grocery.computeLocation(result, 0);
+                        }
                         if(location == null){   //not enough AP to localize
                             Message msg = new Message();
                             msg.what = 0;
